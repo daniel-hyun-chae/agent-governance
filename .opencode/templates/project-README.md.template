@@ -71,9 +71,9 @@ project/
 
 ## AI Development
 
-This project uses the [OpenCode Governance Framework](../FRAMEWORK.md) for AI-assisted development. The governance wrapper provides:
+This project uses the [OpenCode Governance Framework](../README.md) for AI-assisted development. The governance wrapper provides:
 
 - **Backlog-Planner** agent for planning work items
 - **Change-Orchestrator** agent for implementation
 
-See `../FRAMEWORK.md` for details on the two-agent workflow.
+See `../README.md` for details on the two-agent workflow.

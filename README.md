@@ -10,6 +10,7 @@ A portable AI development governance layer for software projects. Provides agent
 - **Session bootstrap**: orientation protocol so agents build context at the start of every session.
 - **Governance skills**: continuous-learning (detect friction, suggest improvements) and governance-authoring (correct taxonomy placement).
 - **Project templates**: scaffolding for backlog, specs, architecture docs, decision logs, and product-specific rules.
+- **Bootstrap command**: `/bootstrap-project` interactively scaffolds a new project from zero to a startable dev container with OpenCode.
 
 ## Repository Structure
 
@@ -22,6 +23,8 @@ A portable AI development governance layer for software projects. Provides agent
     global-guidelines.md        Implementation gate (responsive, tokens, security, a11y, testing)
     session-bootstrap.md        Read-these-files-first protocol
     testing-patterns.md         Architecture-level test checklists
+  commands/
+    bootstrap-project.md        Slash command: scaffold a new project interactively
   skills/
     continuous-learning/        Detect friction, suggest governance improvements
     opencode-governance-authoring/  Taxonomy placement guidance
@@ -61,7 +64,22 @@ OpenCode is opened from the governance workspace root. Agents discover `.opencod
 
 ## Adopting This Framework
 
-### New Project
+### New Project (Interactive)
+
+The fastest way to start a new project is the `/bootstrap-project` command inside OpenCode:
+
+1. Clone the governance framework and open it in OpenCode.
+2. Run `/bootstrap-project`.
+3. Describe your project: what it does, who the users are, and key capabilities.
+4. Answer any targeted follow-up questions.
+5. Review the recommended tech stack and directory structure.
+6. Say "implement" -- the command scaffolds everything, including a working dev container.
+
+See [Bootstrap Command](#bootstrap-command) for details.
+
+### New Project (Manual)
+
+If you prefer to scaffold manually:
 
 ```bash
 # 1. Clone the governance framework
@@ -204,6 +222,44 @@ Override files are read by agents at session start. They extend (not replace) fr
 2. **Two git repos, zero conflicts.** Framework files (outer) and product files (inner) never share a git history.
 3. **Convention over configuration.** The project always lives at `project/`. No config file needed to locate it.
 4. **Override, don't fork.** Product-specific customization uses override files, preserving the ability to pull framework updates cleanly.
+
+## Bootstrap Command
+
+The `/bootstrap-project` OpenCode slash command automates new project scaffolding. It runs in four phases:
+
+| Phase              | What happens                                                                                                                                                                                                                 |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Discovery**      | Asks business and requirement questions: what the project does, who the users are, core capabilities, integrations, and constraints. Derives technology choices from the answers. Asks targeted follow-ups only when needed. |
+| **Recommendation** | Presents a tech stack summary with rationale tied to requirements, directory structure, dev container config, key dependencies, and governance seeding plan.                                                                 |
+| **Confirmation**   | User reviews and either refines or says "implement".                                                                                                                                                                         |
+| **Scaffold**       | Creates all files under `project/`: dev container (with governance env vars), overrides, architecture docs, backlog/spec/decision-log scaffolding, project README, gitignore, and initial config files for the chosen stack. |
+
+### What gets created
+
+```
+project/
+  .devcontainer/
+    devcontainer.json             Governance-compatible container config
+    Dockerfile                    Base image, runtime tools, OpenCode
+  .opencode-overrides/
+    agents/                       Vocabulary, test commands (seeded from answers)
+    rules/                        Product guidelines (seeded from answers)
+  architecture/                   overview, codebase-map, domain-glossary (seeded)
+  backlog/                        README + proposed/ + done/
+  decision-log/                   README
+  scripts/
+    devcontainer-install-opencode.sh
+  spec/                           README
+  src/                            Initial source directory (varies by project type)
+  docker-compose.devcontainer.yml Governance bridge + database services
+  README.md                       Project-specific getting started guide
+  .gitignore                      Stack-appropriate ignores
+  [config files]                  package.json, tsconfig.json, pyproject.toml, etc.
+```
+
+### Output guarantee
+
+After scaffolding, the user can "Reopen in Container" and get a working dev container with internet access, OpenCode loaded with governance, and all project scaffolding in place.
 
 ## Troubleshooting
 
