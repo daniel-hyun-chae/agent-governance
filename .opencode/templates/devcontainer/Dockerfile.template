@@ -1,0 +1,33 @@
+# Dev container Dockerfile template for governance-compatible projects.
+# Copy this to project/.devcontainer/Dockerfile and customize.
+#
+# Choose a base image appropriate for your project's runtime.
+# Examples:
+#   mcr.microsoft.com/vscode/devcontainers/typescript-node:0-20-bullseye
+#   mcr.microsoft.com/vscode/devcontainers/python:0-3.12-bullseye
+#   mcr.microsoft.com/vscode/devcontainers/base:bullseye
+
+ARG BASE_IMAGE=mcr.microsoft.com/vscode/devcontainers/base:bullseye
+FROM ${BASE_IMAGE}
+
+# --- Corporate proxy CA certificate (remove if not needed) ---
+# If your network uses a corporate proxy with a custom root CA,
+# uncomment and replace the certificate below.
+#
+# COPY my-root-ca.crt /usr/share/ca-certificates/my-root-ca.crt
+# RUN echo "my-root-ca.crt" >> /etc/ca-certificates.conf \
+#     && update-ca-certificates
+# ENV NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
+
+# --- Project runtime tools (customize below) ---
+# Example: Node.js with pnpm
+# RUN corepack enable && corepack prepare pnpm@latest --activate
+
+# Example: Install OpenCode
+# RUN curl -fsSL https://opencode.ai/install | bash
+
+# --- Workspace setup ---
+# The workspace path must match docker-compose volume mount + devcontainer.json workspaceFolder.
+ARG WORKSPACE_DIR=/workspaces/workspace/project
+RUN mkdir -p ${WORKSPACE_DIR}
+WORKDIR ${WORKSPACE_DIR}

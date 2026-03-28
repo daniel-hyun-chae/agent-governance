@@ -1,0 +1,33 @@
+# Backlog-Planner Override
+#
+# This file customizes the Backlog-Planner agent for your project.
+# Place it at: project/.opencode-overrides/agents/backlog-planner.override.md
+#
+# The framework agent reads this file at session start and applies its contents.
+
+## Vocabulary
+
+Use these terms consistently in all backlog items, specs, and conversations:
+
+| Term | Meaning |
+|------|---------|
+| learner | A person taking a course |
+| publisher | A person creating course content |
+| course | A structured learning experience |
+| exercise | An interactive practice activity |
+| lesson | A single learning unit within a module |
+| module | A group of related lessons |
+
+<!-- Add or modify terms to match your domain. -->
+
+## Personas
+
+<!-- Define the key user personas for your product. Example: -->
+<!-- - **Learner**: wants to acquire skills at their own pace. -->
+<!-- - **Publisher**: wants to create and monetize courses. -->
+
+## Themes
+
+<!-- Define high-level product themes that group related backlog items. Example: -->
+<!-- - **Core learning loop**: exercises, attempts, feedback, progress tracking. -->
+<!-- - **Publisher tools**: course creation, content management, analytics. -->

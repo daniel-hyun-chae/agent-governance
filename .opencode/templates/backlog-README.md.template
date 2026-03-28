@@ -1,0 +1,81 @@
+# Backlog
+
+<!-- This file tracks all work items for the project. -->
+
+## Folder structure
+
+| Folder | Contains |
+|---|---|
+| `proposed/` | Items that are proposed, ready, or in progress. |
+| `done/` | Completed items (kept for traceability). |
+| `archived-cr/` | Items closed without implementation (changed requirements, superseded, etc.). |
+
+## Agents
+
+| Agent | Owns |
+|---|---|
+| Backlog-Planner | Creates and updates items in `proposed/`. |
+| Change-Orchestrator | Implements items, moves them to `done/` or `archived-cr/`. |
+
+## Conventions
+
+- IDs follow the pattern `BG-NNN` (zero-padded to three digits).
+- Next available ID: `BG-001`.
+- Priority tiers: **P0** (blocking), **P1** (next), **P2** (soon), **P3** (later).
+
+### Status lifecycle
+
+`Proposed` -> `Ready` -> `In Progress` -> `Done`
+
+Only the Change-Orchestrator sets `Ready`, `In Progress`, or `Done`.
+
+### Vocabulary
+
+<!-- PRODUCT: Define your domain vocabulary here.
+     Example:
+     | Term | Meaning |
+     |---|---|
+     | learner | A person consuming content |
+     | publisher | A person creating content |
+-->
+
+### Writing guidance
+
+Describe changes from the user's or affected role's perspective. Reference vocabulary terms exactly as defined above.
+
+### Item template
+
+```markdown
+# BG-NNN: Title
+
+Priority: P0 | P1 | P2 | P3
+Status: Proposed
+Theme: <!-- PRODUCT: Define your themes (e.g., Foundation, User Experience, API) -->
+Spec: spec/<domain>.md > Section Name
+
+## Why now
+## What changes
+## Acceptance criteria
+## Out of scope
+## Dependencies
+## Notes
+```
+
+### Implementation Sections (appended by Change-Orchestrator)
+
+```markdown
+## Implementation Plan
+## Task List
+- [ ] Task one
+- [ ] Task two
+## Implementation Notes
+## Tests
+```
+
+## Current Items
+
+<!-- Track items here as they are created. Example:
+| ID | Title | Status |
+|---|---|---|
+| BG-001 | First feature | Proposed |
+-->

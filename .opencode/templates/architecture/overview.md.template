@@ -1,0 +1,48 @@
+# Architecture Overview
+
+High-level system shape, technology stack, and data flow for this project.
+
+## System Shape
+
+<!-- Describe the major components and how they connect. Example:
+- Web frontend (React SPA)
+- API server (GraphQL)
+- Database (PostgreSQL)
+-->
+
+## Technology Stack
+
+<!-- List the primary technologies. Example:
+| Layer | Technology |
+|---|---|
+| Frontend | React, TypeScript, Vite |
+| API | GraphQL Yoga, TypeGraphQL |
+| Database | PostgreSQL, Drizzle ORM |
+-->
+
+## Data Flow
+
+<!-- Describe how data moves through the system. -->
+
+## Authentication
+
+<!-- Describe the auth model. -->
+
+## Deployment
+
+<!-- Describe environments and deployment. Example:
+| Environment | Infrastructure |
+|---|---|
+| Local | Docker Compose |
+| Staging | Auto-deploy from main |
+| Production | Manual trigger |
+-->
+
+## Local Development
+
+<!-- How to run the project locally. Example:
+```bash
+pnpm install
+pnpm dev
+```
+-->

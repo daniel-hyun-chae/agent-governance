@@ -1,0 +1,37 @@
+# Change-Orchestrator Override
+#
+# This file customizes the Change-Orchestrator agent for your project.
+# Place it at: project/.opencode-overrides/agents/change-orchestrator.override.md
+#
+# The framework agent reads this file at session start and applies its contents.
+
+## Test commands
+
+Run these commands from the `project/` directory (use `workdir` parameter):
+
+| Command | Purpose |
+|---------|---------|
+| `npm test` | Run unit tests |
+| `npm run build` | Build the application |
+| `npm run lint` | Run linter |
+
+<!-- Replace with your project's actual commands (pnpm, yarn, cargo, etc.) -->
+
+## Product-specific testing patterns
+
+<!-- Add testing patterns specific to your domain. Example: -->
+<!-- ### Learner Attempt -->
+<!-- - Submitting a correct answer records the attempt and updates progress. -->
+<!-- - Submitting after the deadline returns an appropriate error. -->
+
+## CI-equivalent validation
+
+Before marking work complete, run these commands locally:
+
+```bash
+npm test
+npm run build
+npm run lint
+```
+
+<!-- List the same checks your CI pipeline runs. -->

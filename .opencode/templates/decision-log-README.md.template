@@ -1,0 +1,36 @@
+# Decision Log
+
+Records of significant architectural, library, and design decisions with rationale.
+
+## Convention
+
+Each decision is a separate markdown file named `NNN-short-title.md` (zero-padded to three digits).
+
+## Template
+
+```markdown
+# NNN: Decision Title
+
+Date: YYYY-MM-DD
+Status: Proposed | Accepted | Superseded by NNN
+
+## Context
+
+What is the issue that motivates this decision?
+
+## Decision
+
+What is the change that we are proposing or have agreed to?
+
+## Consequences
+
+What becomes easier or more difficult because of this decision?
+```
+
+## Decisions
+
+<!-- Track decisions here as they are created. Example:
+| ID | Title | Status |
+|---|---|---|
+| 001 | Use TypeScript for all packages | Accepted |
+-->

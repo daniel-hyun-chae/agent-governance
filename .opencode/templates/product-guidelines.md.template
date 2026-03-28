@@ -1,0 +1,33 @@
+# Product Guidelines
+
+<!-- Product-specific rules for this project. These are loaded alongside
+     the framework rules via opencode.json's dual instruction glob. -->
+
+## Localization
+
+<!-- Define localization requirements. Example:
+     - All user-facing text must use the shared i18n system.
+     - Default language is English. -->
+
+## Lockfile and Package Management
+
+<!-- Define package manager and lockfile rules. Example:
+     - Use pnpm. Lockfile must stay in sync.
+     - Run `pnpm validate:lockfile` before committing. -->
+
+## Seed and Fixture Data
+
+<!-- Define rules for test fixtures and seed data. Example:
+     - Seed data lives in supabase/seed.sql.
+     - Changes require a migration, not manual edits. -->
+
+## Implementation Gate
+
+<!-- Define the CI-equivalent local validation commands. Example:
+     Before marking work complete, run:
+     1. `pnpm validate:lockfile`
+     2. `pnpm lint`
+     3. `pnpm build`
+     4. `pnpm test:unit`
+     5. `pnpm test:integration`
+     6. `pnpm test:e2e` -->

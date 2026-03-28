@@ -1,0 +1,16 @@
+# Project directory has its own git repository
+project/
+
+# Dev container config is product-specific
+.devcontainer/
+
+# OpenCode runtime
+.opencode/node_modules/
+.opencode/bun.lock
+.opencode/memory/
+
+# OS
+.DS_Store
+Thumbs.db
+
+.pnpm-store

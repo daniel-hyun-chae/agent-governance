@@ -1,0 +1,29 @@
+# Specifications
+
+Spec files are the single source of truth for product behavior. Each file covers one domain and has two parts:
+
+1. **Narrative sections** -- context, architecture notes, and design rationale.
+2. **Behaviors** -- a flat list of testable assertions.
+
+## How to read
+
+The narrative gives context. The behaviors are the contract. If the narrative and a behavior disagree, the behavior wins.
+
+## Maintenance
+
+- The **Change-Orchestrator** agent updates spec files after implementing a feature.
+- Each backlog item has a `Spec:` field pointing to the affected file and section.
+- Acceptance criteria from backlog items dissolve into spec behaviors after implementation.
+
+## Files
+
+<!-- PRODUCT: List your spec files here as they are created. Example:
+| File | Domain |
+|---|---|
+| `platform.md` | Core platform infrastructure |
+| `authentication.md` | Auth flows and session management |
+-->
+
+## Relationship to tests
+
+Tests use descriptive names that map to spec behaviors. There is no formal ID system -- the test name should make the corresponding behavior obvious. See `testing-patterns.md` for architecture-level checklists.

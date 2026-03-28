@@ -1,0 +1,22 @@
+// Dev container configuration template for governance-compatible projects.
+// Copy this to project/.devcontainer/devcontainer.json and customize.
+//
+// Required: a docker-compose.devcontainer.yml in the project root.
+// See the companion template for the docker-compose file.
+{
+  "name": "PROJECT_NAME-dev",
+  "dockerComposeFile": "../docker-compose.devcontainer.yml",
+  "service": "dev",
+  "workspaceFolder": "/workspaces/workspace/project",
+  "forwardPorts": [],
+  "remoteUser": "node",
+  "postCreateCommand": "echo 'Add your post-create steps here (e.g., dependency install, tool setup)'",
+  "postStartCommand": "echo 'Add your post-start steps here (e.g., conditional dependency check)'",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "sst-dev.opencode"
+      ]
+    }
+  }
+}

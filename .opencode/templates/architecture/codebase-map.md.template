@@ -1,0 +1,53 @@
+# Codebase Map
+
+<!-- A high-level map of the repository structure. Keep this updated when
+     directories or module-level files are added, removed, or renamed. -->
+
+## Project Root
+
+<!-- List top-level directories and their purpose. Example:
+
+| Path | Purpose |
+|---|---|
+| `apps/` | Deployable applications |
+| `shared/` | Shared packages and libraries |
+| `tests/` | Test suites |
+-->
+
+## Applications
+
+<!-- Describe each application. Example:
+
+### apps/web
+- Framework: React + Vite
+- Entry: apps/web/src/main.tsx
+-->
+
+## Shared Packages
+
+<!-- Describe shared packages. Example:
+
+### shared/ui
+- Shared UI component library
+-->
+
+## Infrastructure
+
+<!-- Database, deployment, CI/CD configuration. -->
+
+## Governance
+
+<!-- Governance files and their locations. In a governance workspace:
+
+| Path | Purpose |
+|---|---|
+| `.opencode/rules/` | Product-specific rules (loaded alongside framework rules) |
+| `architecture/` | This directory -- codebase map, glossary, overview |
+| `backlog/` | Work item tracking |
+| `spec/` | Product behavior specifications |
+| `decision-log/` | Architectural decision records |
+-->
+
+## Validation
+
+<!-- Optional: describe how to validate the codebase map is accurate. -->

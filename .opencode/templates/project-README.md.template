@@ -1,0 +1,79 @@
+# PROJECT_NAME
+
+Brief description of what this project does.
+
+## Prerequisites
+
+<!-- List tools and versions required to develop this project. Example: -->
+<!-- - Node.js 20+ -->
+<!-- - pnpm 9+ -->
+<!-- - Docker (for dev container) -->
+
+## Getting Started
+
+### Using Dev Container (Recommended)
+
+1. Clone the governance workspace (if not already):
+   ```bash
+   git clone <governance-repo-url> my-workspace
+   cd my-workspace
+   ```
+
+2. Clone this project into the workspace:
+   ```bash
+   git clone <this-repo-url> project/
+   ```
+
+3. Open `project/` in VS Code and select **Reopen in Container** when prompted.
+
+4. Inside the container, dependencies are installed automatically via `postCreateCommand`.
+
+### Local Development (Without Dev Container)
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Run tests
+npm test
+```
+
+## Project Structure
+
+```
+project/
+  .devcontainer/          Dev container configuration
+  .opencode-overrides/    AI agent overrides (vocabulary, test commands)
+  apps/                   Application code
+  architecture/           Architecture documentation
+  backlog/                Product backlog
+  spec/                   Product specifications
+  decision-log/           Architectural decisions
+```
+
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm test` | Run tests |
+| `npm run build` | Build for production |
+| `npm run lint` | Run linter |
+
+## Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+<!-- | `DATABASE_URL` | PostgreSQL connection string | (required) | -->
+
+## AI Development
+
+This project uses the [OpenCode Governance Framework](../FRAMEWORK.md) for AI-assisted development. The governance wrapper provides:
+
+- **Backlog-Planner** agent for planning work items
+- **Change-Orchestrator** agent for implementation
+
+See `../FRAMEWORK.md` for details on the two-agent workflow.
