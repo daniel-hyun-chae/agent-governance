@@ -9,9 +9,33 @@
   "service": "dev",
   "workspaceFolder": "/workspaces/workspace/project",
   "forwardPorts": [],
+
+  // Set remoteUser to match the REMOTE_USER ARG in the Dockerfile.
+  // Microsoft images use: node (javascript-node), vscode (python, go, java, base).
   "remoteUser": "node",
-  "postCreateCommand": "echo 'Add your post-create steps here (e.g., dependency install, tool setup)'",
-  "postStartCommand": "echo 'Add your post-start steps here (e.g., conditional dependency check)'",
+  "containerUser": "node",
+  "updateRemoteUserUID": false,
+
+  "remoteEnv": {
+    "CI": "true"
+  },
+
+  // Layer 2 of 2: belt-and-suspenders OpenCode install. The Dockerfile bakes
+  // OpenCode into the image; this script re-checks and installs if missing.
+  // Prepend your own setup (dependency install, etc.) before the OpenCode line.
+  "postCreateCommand": "sh scripts/devcontainer-install-opencode.sh",
+  "postStartCommand": "echo 'Add post-start steps here (e.g., dependency refresh)'",
+
+  "mounts": [
+    // --- OpenCode persistence (required -- do not remove) ---
+    // Named volumes keep OpenCode data and state across container rebuilds.
+    "source=${localWorkspaceFolderBasename}-opencode-data,target=/home/node/.local/share/opencode,type=volume",
+    "source=${localWorkspaceFolderBasename}-opencode-state,target=/home/node/.local/state/opencode,type=volume",
+    // Bind-mount host auth.json so the user does not have to re-authenticate
+    // after a container rebuild. Remove if the file does not exist on the host.
+    "source=${localEnv:HOME}/.local/share/opencode/auth.json,target=/home/node/.local/share/opencode/auth.json,type=bind"
+  ],
+
   "customizations": {
     "vscode": {
       "extensions": [

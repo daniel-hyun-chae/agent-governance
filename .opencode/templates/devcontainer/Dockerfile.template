@@ -3,16 +3,18 @@
 #
 # Choose a base image appropriate for your project's runtime.
 # Examples:
-#   mcr.microsoft.com/vscode/devcontainers/typescript-node:0-20-bullseye
-#   mcr.microsoft.com/vscode/devcontainers/python:0-3.12-bullseye
-#   mcr.microsoft.com/vscode/devcontainers/base:bullseye
+#   mcr.microsoft.com/devcontainers/javascript-node:20
+#   mcr.microsoft.com/devcontainers/python:3.12
+#   mcr.microsoft.com/devcontainers/go:1.22
+#   mcr.microsoft.com/devcontainers/java:21
+#   mcr.microsoft.com/devcontainers/base:bullseye
 
-ARG BASE_IMAGE=mcr.microsoft.com/vscode/devcontainers/base:bullseye
+ARG BASE_IMAGE=mcr.microsoft.com/devcontainers/base:bullseye
 FROM ${BASE_IMAGE}
 
-# --- Corporate proxy CA certificate (remove if not needed) ---
+# --- Corporate proxy CA certificate (remove block if not needed) ---
 # If your network uses a corporate proxy with a custom root CA,
-# uncomment and replace the certificate below.
+# uncomment and replace the certificate filename below.
 #
 # COPY my-root-ca.crt /usr/share/ca-certificates/my-root-ca.crt
 # RUN echo "my-root-ca.crt" >> /etc/ca-certificates.conf \
@@ -20,14 +22,39 @@ FROM ${BASE_IMAGE}
 # ENV NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
 
 # --- Project runtime tools (customize below) ---
-# Example: Node.js with pnpm
-# RUN corepack enable && corepack prepare pnpm@latest --activate
+# Examples:
+#   RUN corepack enable && corepack prepare pnpm@latest --activate
+#   RUN pip install --no-cache-dir poetry
+#   RUN go install golang.org/x/tools/gopls@latest
 
-# Example: Install OpenCode
-# RUN curl -fsSL https://opencode.ai/install | bash
+# --- OpenCode CLI (required -- do not remove) --------------------------------
+# Layer 1 of 2: bake OpenCode into the image so it is available immediately on
+# container start. The postCreateCommand install script (Layer 2) provides a
+# belt-and-suspenders fallback in case the image is stale or the install fails
+# during build.
+ARG REMOTE_USER=node
+RUN curl -fsSL https://opencode.ai/install -o /tmp/install_opencode.sh \
+    && chmod +x /tmp/install_opencode.sh \
+    && OPENCODE_INSTALL_DIR=/usr/local/bin /tmp/install_opencode.sh \
+    && rm -f /tmp/install_opencode.sh \
+    && if [ ! -x /usr/local/bin/opencode ]; then \
+         if [ -x /root/.opencode/bin/opencode ]; then \
+           ln -sf /root/.opencode/bin/opencode /usr/local/bin/opencode; \
+         else \
+           echo "ERROR: opencode binary not found after install" && exit 1; \
+         fi; \
+       fi \
+    && /usr/local/bin/opencode --version
+
+# Prepare OpenCode data directories for the container user.
+RUN mkdir -p /home/${REMOTE_USER}/.local/share/opencode \
+             /home/${REMOTE_USER}/.local/state/opencode \
+    && chown -R ${REMOTE_USER}:${REMOTE_USER} /home/${REMOTE_USER}/.local
+# --- End OpenCode CLI ---------------------------------------------------------
 
 # --- Workspace setup ---
 # The workspace path must match docker-compose volume mount + devcontainer.json workspaceFolder.
 ARG WORKSPACE_DIR=/workspaces/workspace/project
-RUN mkdir -p ${WORKSPACE_DIR}
+RUN mkdir -p ${WORKSPACE_DIR} \
+    && chown -R ${REMOTE_USER}:${REMOTE_USER} /workspaces
 WORKDIR ${WORKSPACE_DIR}

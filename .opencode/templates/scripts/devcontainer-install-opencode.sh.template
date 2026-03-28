@@ -1,0 +1,73 @@
+#!/bin/sh
+# Belt-and-suspenders OpenCode install for dev containers.
+# Layer 2 of 2: the Dockerfile bakes OpenCode into the image at build time.
+# This script runs at container creation (postCreateCommand) and re-installs
+# if the binary is missing or stale.
+#
+# Copy this to project/scripts/devcontainer-install-opencode.sh.
+#
+# Environment variables (optional):
+#   OPENCODE_CA_CERT  -- path to a custom CA certificate bundle for curl/npm
+#   INSECURE=1        -- skip TLS verification (not recommended, last resort)
+
+set -e
+
+# Ensure data directory exists.
+mkdir -p "$HOME/.local/share/opencode"
+
+# Exit early if OpenCode is already available and working.
+if command -v opencode >/dev/null 2>&1; then
+  echo "[opencode] already installed: $(opencode --version)"
+  exit 0
+fi
+
+echo "[opencode] not found on PATH -- installing..."
+
+# Determine CA cert path (corporate proxy support).
+CA_CERT="${OPENCODE_CA_CERT:-}"
+if [ -z "$CA_CERT" ] && [ -f "$HOME/.config/opencode/ca-certificates.crt" ]; then
+  CA_CERT="$HOME/.config/opencode/ca-certificates.crt"
+fi
+
+# Attempt 1: curl installer.
+INSTALLED=0
+if command -v curl >/dev/null 2>&1; then
+  CURL_OPTS="-fsSL"
+  if [ -n "$CA_CERT" ]; then
+    CURL_OPTS="$CURL_OPTS --cacert $CA_CERT"
+  elif [ "${INSECURE:-0}" = "1" ]; then
+    CURL_OPTS="$CURL_OPTS -k"
+  fi
+  # shellcheck disable=SC2086
+  if curl $CURL_OPTS https://opencode.ai/install | sh; then
+    INSTALLED=1
+  else
+    echo "[opencode] curl install failed, trying npm fallback..."
+  fi
+fi
+
+# Attempt 2: npm global install.
+if [ "$INSTALLED" = "0" ] && command -v npm >/dev/null 2>&1; then
+  NPM_CONFIG_PREFIX="${NPM_CONFIG_PREFIX:-$HOME/.npm-global}"
+  export NPM_CONFIG_PREFIX
+  mkdir -p "$NPM_CONFIG_PREFIX"
+  if npm install -g opencode-ai; then
+    INSTALLED=1
+    # Ensure npm global bin is on PATH for this session.
+    export PATH="$NPM_CONFIG_PREFIX/bin:$PATH"
+  else
+    echo "[opencode] npm install failed"
+  fi
+fi
+
+# Verify.
+if command -v opencode >/dev/null 2>&1; then
+  echo "[opencode] installed successfully: $(opencode --version)"
+elif [ -x "$HOME/.opencode/bin/opencode" ]; then
+  echo "[opencode] found at $HOME/.opencode/bin/opencode -- adding to PATH"
+  export PATH="$HOME/.opencode/bin:$PATH"
+  opencode --version
+else
+  echo "[opencode] WARNING: could not install OpenCode. You can install manually later."
+  # Exit 0 intentionally -- do not block container creation.
+fi

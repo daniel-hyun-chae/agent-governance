@@ -30,6 +30,7 @@ A portable AI development governance layer for software projects. Provides agent
     opencode-governance-authoring/  Taxonomy placement guidance
   templates/
     devcontainer/               Dev container templates (governance-compatible)
+    scripts/                    Install scripts (OpenCode, etc.)
     overrides/                  Starter override files for agents
     architecture/               Architecture doc templates
     backlog-README.md.template
@@ -39,7 +40,7 @@ A portable AI development governance layer for software projects. Provides agent
     project-README.md.template
 opencode.json                   MCP servers + dual instruction loading
 AGENTS.md                       Workspace convention + agent taxonomy
-FRAMEWORK.md                    This file
+README.md                       This file
 .gitignore                      Excludes project/ directory
 ```
 

@@ -100,7 +100,10 @@ Read and customize `.opencode/templates/devcontainer/*`:
 
 - `name`: `"{project-name}-dev"`
 - `forwardPorts`: from port defaults table below
-- `postCreateCommand`: install command for chosen package manager + tools
+- `remoteUser` / `containerUser`: match the `REMOTE_USER` ARG in the Dockerfile (`node` for javascript-node images, `vscode` for python/go/java/base images)
+- `postCreateCommand`: project dependency install commands **followed by** `sh scripts/devcontainer-install-opencode.sh` (must always be last)
+- Keep all OpenCode mounts (data volume, state volume, auth.json bind) -- these are mandatory
+- Keep the `sst-dev.opencode` VSCode extension
 
 **`project/docker-compose.devcontainer.yml`** (from `docker-compose.devcontainer.yml.template`)
 
@@ -112,17 +115,22 @@ Read and customize `.opencode/templates/devcontainer/*`:
 **`project/.devcontainer/Dockerfile`** (from `Dockerfile.template`)
 
 - `BASE_IMAGE`: from base image defaults table below
-- Uncomment CA cert section if corporate cert selected
-- Install: chosen package manager, language runtime tools, OpenCode (via curl)
+- `REMOTE_USER`: `node` for javascript-node images, `vscode` for python/go/java/base images
+- Uncomment and fill the CA cert section if corporate cert is needed
+- Add project runtime tools (package manager, language tools) in the marked section
+- **Do not remove** the OpenCode CLI section -- it bakes OpenCode into the image (Layer 1 of 2)
 - `WORKDIR /workspaces/workspace/project`
 
 ### 4.3 OpenCode install script
 
-**`project/scripts/devcontainer-install-opencode.sh`**
+**`project/scripts/devcontainer-install-opencode.sh`** (from `.opencode/templates/scripts/devcontainer-install-opencode.sh.template`)
 
-- Download latest OpenCode release via curl
-- If corporate CA cert: set `NODE_EXTRA_CA_CERTS` and pass cert to install
-- `chmod +x` the script
+Copy the template and `chmod +x`. This is Layer 2 of 2 -- it runs at container creation via `postCreateCommand` and re-installs OpenCode if the Dockerfile-baked binary is missing or stale. The script:
+
+- Exits early if `opencode` is already on PATH (fast path)
+- Supports corporate CA certs via `OPENCODE_CA_CERT` env var
+- Falls back from curl to npm if curl install fails
+- Never blocks container creation (exits 0 on failure with a warning)
 
 ### 4.4 Governance overrides (3 files)
 
