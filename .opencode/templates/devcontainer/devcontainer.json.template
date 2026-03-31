@@ -20,11 +20,12 @@
     "CI": "true"
   },
 
-  // Layer 2 of 2: belt-and-suspenders OpenCode install. The Dockerfile bakes
-  // OpenCode into the image; this script re-checks and installs if missing.
-  // Prepend your own setup (dependency install, etc.) before the OpenCode line.
-  "postCreateCommand": "sh scripts/devcontainer-install-opencode.sh",
-  "postStartCommand": "echo 'Add post-start steps here (e.g., dependency refresh)'",
+  // Initialization order should be explicit and repeatable:
+  // 1) repair mounted-home permissions, 2) ensure OpenCode exists, 3) install deps.
+  // Replace dependency commands with your stack-specific equivalents.
+  "postCreateCommand": "bash scripts/devcontainer-fix-home-perms.sh && bash scripts/devcontainer-install-opencode.sh && echo 'add dependency install commands here'",
+  // Re-apply permission fixes after mounts attach on each start.
+  "postStartCommand": "bash scripts/devcontainer-fix-home-perms.sh",
 
   "mounts": [
     // --- OpenCode persistence (required -- do not remove) ---
@@ -33,7 +34,12 @@
     "source=${localWorkspaceFolderBasename}-opencode-state,target=/home/node/.local/state/opencode,type=volume",
     // Bind-mount host auth.json so the user does not have to re-authenticate
     // after a container rebuild. Remove if the file does not exist on the host.
-    "source=${localEnv:HOME}/.local/share/opencode/auth.json,target=/home/node/.local/share/opencode/auth.json,type=bind"
+    "source=${localEnv:HOME}/.local/share/opencode/auth.json,target=/home/node/.local/share/opencode/auth.json,type=bind",
+    // --- Optional quality-of-life mounts (keep when available) ---
+    "source=${localEnv:HOME}/.ssh,target=/home/node/.ssh,type=bind",
+    "source=${localWorkspaceFolderBasename}-bashhistory,target=/commandhistory,type=volume",
+    "source=${localEnv:HOME}/.netrc,target=/home/node/.netrc,type=bind",
+    "source=${localWorkspaceFolderBasename}-ms-playwright,target=/home/node/.cache/ms-playwright,type=volume"
   ],
 
   "customizations": {

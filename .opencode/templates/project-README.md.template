@@ -28,6 +28,8 @@ Brief description of what this project does.
 
 4. Inside the container, dependencies are installed automatically via `postCreateCommand`.
 
+5. If your frontend uses `pnpm` and native build dependencies (for example `esbuild`), prefer a repo-level allowlist (such as `pnpm.onlyBuiltDependencies`) so installs stay non-interactive in the container.
+
 ### Local Development (Without Dev Container)
 
 ```bash

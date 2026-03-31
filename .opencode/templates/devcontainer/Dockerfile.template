@@ -20,6 +20,7 @@ FROM ${BASE_IMAGE}
 # RUN echo "my-root-ca.crt" >> /etc/ca-certificates.conf \
 #     && update-ca-certificates
 # ENV NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
+# ENV REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
 
 # --- Project runtime tools (customize below) ---
 # Examples:
@@ -46,10 +47,13 @@ RUN curl -fsSL https://opencode.ai/install -o /tmp/install_opencode.sh \
        fi \
     && /usr/local/bin/opencode --version
 
-# Prepare OpenCode data directories for the container user.
-RUN mkdir -p /home/${REMOTE_USER}/.local/share/opencode \
+# Prepare runtime directories used by OpenCode and common tools.
+RUN mkdir -p /home/${REMOTE_USER}/.cache \
+             /home/${REMOTE_USER}/.cache/ms-playwright \
+             /home/${REMOTE_USER}/.local/share/opencode \
              /home/${REMOTE_USER}/.local/state/opencode \
-    && chown -R ${REMOTE_USER}:${REMOTE_USER} /home/${REMOTE_USER}/.local
+             /home/${REMOTE_USER}/.local/share/uv/tools \
+    && chown -R ${REMOTE_USER}:${REMOTE_USER} /home/${REMOTE_USER}/.cache /home/${REMOTE_USER}/.local
 # --- End OpenCode CLI ---------------------------------------------------------
 
 # --- Workspace setup ---

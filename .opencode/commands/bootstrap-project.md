@@ -56,7 +56,7 @@ Present:
 
 1. **Tech stack summary** -- table: Layer | Technology | Why (traced to user requirement)
 2. **Directory structure** -- the `project/` tree that will be created
-3. **Dev container** -- base image, installed tools, forwarded ports, env vars
+3. **Dev container** -- base image, installed tools, forwarded ports, env vars, initialization sequence
 4. **Key dependencies** -- initial packages/libraries
 5. **Governance seeding** -- how vocabulary, test commands, and product rules will be customized from what you learned about the domain
 
@@ -101,13 +101,23 @@ Read and customize `.opencode/templates/devcontainer/*`:
 - `name`: `"{project-name}-dev"`
 - `forwardPorts`: from port defaults table below
 - `remoteUser` / `containerUser`: match the `REMOTE_USER` ARG in the Dockerfile (`node` for javascript-node images, `vscode` for python/go/java/base images)
-- `postCreateCommand`: project dependency install commands **followed by** `sh scripts/devcontainer-install-opencode.sh` (must always be last)
+- `postCreateCommand`: include an explicit initialization chain in this order:
+  1. `bash scripts/devcontainer-fix-home-perms.sh`
+  2. `bash scripts/devcontainer-install-opencode.sh`
+  3. project dependency install commands (backend first, then frontend when both exist)
+- `postStartCommand`: run `bash scripts/devcontainer-fix-home-perms.sh` so permission drift from mounts is repaired on each start
 - Keep all OpenCode mounts (data volume, state volume, auth.json bind) -- these are mandatory
+- Add quality-of-life mounts when relevant:
+  - SSH mount (`${localEnv:HOME}/.ssh`)
+  - shell history named volume (`/commandhistory`)
+  - netrc mount (`${localEnv:HOME}/.netrc`)
+  - Playwright cache volume (`/home/<remote-user>/.cache/ms-playwright`)
 - Keep the `sst-dev.opencode` VSCode extension
 
 **`project/docker-compose.devcontainer.yml`** (from `docker-compose.devcontainer.yml.template`)
 
 - Keep the governance bridge (volume `..:/workspaces/workspace:cached`, env vars `OPENCODE_CONFIG_DIR`, `OPENCODE_CONFIG`) -- these are mandatory
+- Keep `command: sleep infinity` so editors can attach reliably
 - Add database service block if a database was chosen (see database services below)
 - Add `DATABASE_URL` env var if database chosen (see URL formats below)
 - Expose database ports
@@ -118,10 +128,29 @@ Read and customize `.opencode/templates/devcontainer/*`:
 - `REMOTE_USER`: `node` for javascript-node images, `vscode` for python/go/java/base images
 - Uncomment and fill the CA cert section if corporate cert is needed
 - Add project runtime tools (package manager, language tools) in the marked section
+- If a corporate CA certificate is configured, set both `NODE_EXTRA_CA_CERTS` and `REQUESTS_CA_BUNDLE`
+- Pre-create and `chown` runtime directories for OpenCode and common tooling:
+  - `/home/${REMOTE_USER}/.cache`
+  - `/home/${REMOTE_USER}/.cache/ms-playwright`
+  - `/home/${REMOTE_USER}/.local/share/opencode`
+  - `/home/${REMOTE_USER}/.local/state/opencode`
+  - `/home/${REMOTE_USER}/.local/share/uv/tools` (when Python tooling is present)
 - **Do not remove** the OpenCode CLI section -- it bakes OpenCode into the image (Layer 1 of 2)
 - `WORKDIR /workspaces/workspace/project`
 
-### 4.3 OpenCode install script
+### 4.3 Permission repair script
+
+**`project/scripts/devcontainer-fix-home-perms.sh`** (from `.opencode/templates/scripts/devcontainer-fix-home-perms.sh.template`)
+
+Copy the template and `chmod +x`. This script must be idempotent and safe to run in both `postCreateCommand` and `postStartCommand`.
+
+The script must:
+
+- `mkdir -p` required runtime directories under `/home/${REMOTE_USER}`
+- `chown -R ${REMOTE_USER}:${REMOTE_USER}` over `/home/${REMOTE_USER}/.cache` and `/home/${REMOTE_USER}/.local`
+- print concise status messages before and after applying fixes
+
+### 4.4 OpenCode install script
 
 **`project/scripts/devcontainer-install-opencode.sh`** (from `.opencode/templates/scripts/devcontainer-install-opencode.sh.template`)
 
@@ -132,7 +161,7 @@ Copy the template and `chmod +x`. This is Layer 2 of 2 -- it runs at container c
 - Falls back from curl to npm if curl install fails
 - Never blocks container creation (exits 0 on failure with a warning)
 
-### 4.4 Governance overrides (3 files)
+### 4.5 Governance overrides (3 files)
 
 Read and customize `.opencode/templates/overrides/*` and `.opencode/templates/product-guidelines.md.template`:
 
@@ -152,7 +181,7 @@ Read and customize `.opencode/templates/overrides/*` and `.opencode/templates/pr
 - Set localization rules placeholder
 - Fill implementation gate with stack-appropriate validation commands
 
-### 4.5 Architecture docs (3 files)
+### 4.6 Architecture docs (3 files)
 
 Read and customize `.opencode/templates/architecture/*`:
 
@@ -170,7 +199,7 @@ Read and customize `.opencode/templates/architecture/*`:
 
 - Seed with the same vocabulary terms used in backlog-planner override
 
-### 4.6 Governance scaffolding (3 files)
+### 4.7 Governance scaffolding (3 files)
 
 Copy templates directly (minimal customization):
 
@@ -178,13 +207,18 @@ Copy templates directly (minimal customization):
 **`project/spec/README.md`** (from `spec-README.md.template`)
 **`project/decision-log/README.md`** (from `decision-log-README.md.template`)
 
-### 4.7 Project files
+### 4.8 Project files
 
 **`project/README.md`** (from `project-README.md.template`)
 
 - Fill: project name, description, prerequisites, getting started, project structure, scripts, env vars, ports
 
 **`project/.gitignore`** -- appropriate for the chosen stack (node_modules, dist, .env, **pycache**, etc.)
+
+If using `pnpm`, include a non-interactive build-script approval strategy so dev container startup is repeatable:
+
+- Prefer `pnpm.onlyBuiltDependencies` in `package.json` for required native packages (for example `esbuild` in Vite stacks)
+- Use interactive `pnpm approve-builds` only as a local one-off fallback
 
 **Stack config files** -- create the minimal set for the chosen stack:
 
@@ -194,7 +228,7 @@ Copy templates directly (minimal customization):
 - Java: `pom.xml` or `build.gradle`
 - Linter/formatter config as appropriate (e.g., `.eslintrc`, `.prettierrc`, `ruff.toml`)
 
-### 4.8 Git initialization
+### 4.9 Git initialization
 
 If `project/` does not already have a `.git` directory:
 
@@ -305,5 +339,6 @@ After scaffolding, the user must be able to:
 3. The container has internet access (CA cert installed if selected)
 4. OpenCode is installed and loads the governance framework (agents, rules, skills, commands)
 5. `project/` has a valid structure with all governance scaffolding in place
+6. Dev container startup is repeatable with no manual permission repair and no interactive package-manager prompts
 
 Verify by listing the created file tree and confirming every expected file exists. Report the full list to the user.
